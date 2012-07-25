@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Phone Gap AJAX Demo</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+    <link rel="stylesheet" href="includes/demo.css" />
+
+    <style>
+
+    </style>
+    <script type="text/javascript" src="includes/demo.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-1.8.1.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+    <script type="text/javascript">
+
+        function appReady(){
+            $("#infodiv").html("Testing JSONP with jQuery");
+        }
+
+		// our jQuery page-loaded handler
+        $(document).ready(function(){
+            $("#get-name").click(function(){
+                handleClick();
+            });
+
+            $("#ajax_error").ajaxError(function(e, jqxhr, settings, exception) {
+                $(this).text( "Error requesting page " + settings.url);
+            });
+        });
+
+		// next 7 lines are to support PhoneGap initialization
+        document.addEventListener("deviceready", appReady, false);
+
+        $( document ).bind( "mobileinit", function() {
+            // Make your jQuery Mobile framework configuration changes here!
+            $("#infodiv").html('mobileinit worked');
+            $.mobile.allowCrossDomainPages = true;
+        });
+
+
+		// called when button is clicked
+        function handleClick(){
+            var url = 'http://fineglasswork.com/histmarkers/name.php';  // you'll want to change
+
+            /***
+
+            // this is an example of how to use the getJSON wrapper method.
+            // If you use getJSON, you need to build out the querystring yourself
+            // eg. : url = url + "?first=" + first + "&last=" + last + "&callback=jp";
+
+            $.getJSON(url,
+	            function(res){
+	            debugger;
+	            $("#resultsdiv").html("Hello, " + res[0].fullname + " | " + res[1].fullname);
+            });
+            ***/
+
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                contentType: "application/json",
+                dataType: 'jsonp',
+                data: {first: $("#firstname").val(), last: $("#lastname").val() },
+                crossDomain: true,
+                success: function(res) {
+                    $("#resultsdiv").html("Hello, " + res.firstname + " " + res.lastname);
+                    console.dir(res.fullname);
+                },
+                error: function(e) {
+                    console.log(e.message);
+                },
+                complete: function(data) {
+                    console.log(e.message);
+                }
+            });
+
+        }
+    </script>
+</head>
+<body>
+<!-- Home -->
+<div data-role="page" id="page1">
+    <div data-role="content" style="padding: 15px">
+        <h3  id="infodiv">
+            Heading
+        </h3>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                <label for="firstname">
+                    First Name
+                </label>
+                <input id="firstname" placeholder="" value="" type="text" />
+            </fieldset>
+        </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                <label for="lastname">
+                    Last Name
+                </label>
+                <input id="lastname" placeholder="" value="" type="text" />
+            </fieldset>
+        </div>
+        <a data-role="button" data-inline="true" data-transition="turn" data-theme="d" href="#page1" data-icon="star"
+           id="get-name" data-iconpos="left">
+            Click Me
+        </a>
+    </div>
+    <div id="resultsdiv"></div>
+    <div id='ajax_error'></div>
+</div>
+
+</body>
+</html>
